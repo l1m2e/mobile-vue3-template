@@ -1,0 +1,36 @@
+{
+	"prettier.useTabs": true,
+	"[vue]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "vscode.html-language-features"
+	},
+
+	"[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "vscode.css-language-features"
+	},
+	"editor.inlineSuggest.enabled": true,
+	"[scss]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+
+	"editor.codeActionsOnSave": {},
+	"editor.cursorSmoothCaretAnimation": true,
+	"remote.SSH.remotePlatform": {
+		"192.168.88.14": "linux",
+		"47.98.173.227": "linux"
+	},
+	"unocss.disable": true,
+	"editor.fontSize": 13,
+	"workbench.list.smoothScrolling": true
+}
