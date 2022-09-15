@@ -6,6 +6,8 @@ import App from './App.vue'
 import '@unocss/reset/tailwind.css'
 import './styles/main.css'
 import 'uno.css'
+//pc 端适配
+import '@varlet/touch-emulator'
 
 const app = createApp(App)
 const router = createRouter({

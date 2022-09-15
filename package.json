@@ -11,8 +11,12 @@
     "up": "taze major -I"
   },
   "dependencies": {
+    "@varlet/touch-emulator": "^1.27.20",
+    "@varlet/ui": "^1.27.20",
     "@vueuse/core": "^9.2.0",
     "axios": "^0.27.2",
+    "dayjs": "^1.11.5",
+    "sass": "^1.54.9",
     "vue": "^3.2.38",
     "vue-router": "^4.1.5"
   },
@@ -21,6 +25,7 @@
     "@iconify-json/carbon": "^1.1.7",
     "@types/node": "^18.7.15",
     "@unocss/reset": "^0.45.15",
+    "@unocss/transformer-directives": "^0.45.21",
     "@vitejs/plugin-vue": "^3.1.0",
     "@vue/test-utils": "^2.0.2",
     "eslint": "^8.23.0",
