@@ -1,3 +1,5 @@
+import { type } from 'os'
+
 export interface IcourseInfo {
 	startTime: number
 	endTime: number
@@ -11,4 +13,8 @@ interface IstuInfo {
 	sex: number
 	state: number
 	icid: string
+}
+interface IScoketMsg {
+	type: string
+	data: any
 }

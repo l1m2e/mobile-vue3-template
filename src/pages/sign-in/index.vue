@@ -4,48 +4,29 @@ import { setReactive } from '~/utils/setReactve'
 import dayjs from 'dayjs'
 import manIcon from '~/assets/img/txnan.png'
 import girlIcon from '~/assets/img/txnv.png'
-import { IcourseInfo } from './interface'
-// import { Picker, Dialog, Snackbar } from '@varlet/ui'
+import { IcourseInfo, IScoketMsg } from './interface'
+import { ws } from '~/service/scoket'
 
-const ws = new WebSocket('ws://192.168.88.123:8080/IClassWebsocket/Teacher/P1000100')
-// 链接成功
-ws.onopen = function () {
-	console.log('连接成功')
-}
-// 监听链接
-ws.onmessage = function (e) {
-	console.log('%cindex.vue line:20 e', 'color: white; background-color: #007acc;', e)
-	enum MsgType {
-		signRes = 'sign_change', // 签到返回
-		error = 'error',
-		success = 'success'
-	}
-	let { data: res, type } = JSON.parse(e.data)
-	if (type == MsgType.signRes) {
-		const item = courseInfo.stuSignAtn.find(item => item.icid === res)
-		if (item) {
-			item.state = 1
-		}
-	}
-	if ((type = MsgType.success)) {
-		switch (res) {
-			case '发起签到成功':
-				isStart.value = false
-				break
-			case '该课程已发起过签到':
-				isStart.value = false
-				break
-		}
-	}
-}
-// 链接关闭
-ws.onclose = function (event) {
-	console.log('链接关闭了', event)
-}
+// const ws = new WebSocket('ws://192.168.88.123:8080/IClassWebsocket/Teacher/P1000100')
+// 	if ((type = MsgType.success)) {
+// 		switch (res) {
+// 			case '发起签到成功':
+// 				isStart.value = false
+// 				break
+// 			case '该课程已发起过签到':
+// 				isStart.value = false
+// 				break
+// 		}
+// 	}
+// }
+// // 链接关闭
+// ws.onclose = function (event) {
+// 	console.log('链接关闭了', event)
+// }
 
 const tempTime = ref(5) //默认签到时间
 const columns = [[5, 10, 15, 20, 25, 30, 35]]
-const isStart = ref(true)
+const isStart = ref(false)
 const picker = async () => {
 	await Picker({ columns, title: '请选择时间(分钟)', onConfirm })
 }
@@ -77,10 +58,31 @@ const getCourseInfo = async () => {
 	const res = await getCourseInfoApi(params)
 	setReactive(courseInfo, res)
 }
-getCourseInfo()
+// getCourseInfo()
 
+const createAction = async () => {
+	const res = await Dialog({
+		title: '警告',
+		message: '如果确认后全部学生均需要重新签到'
+	})
+	if (res == 'confirm') {
+		Snackbar.success('签到已结束')
+		isStart.value = true
+	}
+}
+const endSignIn = () => {
+	createAction()
+}
+
+enum MsgType {
+	signRes = 'sign_change', // 签到返回
+	error = 'error', // 错误
+	success = 'success' // 成功
+}
+const { data, send, close } = ws('/IClassWebsocket/122', { heartbeat: true })
+// 发起签到
 const startSignIn = () => {
-	const obj = {
+	const msg = {
 		type: 'startSign',
 		data: {
 			classRoomMac: '教室mac',
@@ -88,17 +90,27 @@ const startSignIn = () => {
 			endTime: 1663037278000
 		}
 	}
-	ws.send(JSON.stringify(obj))
+	send(msg)
 }
+send('error')
+watch(data, (v: IScoketMsg) => {
+	switch (v.type) {
+		case MsgType.signRes:
+			signChange(v.data)
+			break
+		case MsgType.error:
+			signChange(v.data)
+			break
+		case MsgType.success:
+			break
+	}
+})
 
-const actions = {
-	confirm: () => Snackbar.success('confirm'),
-	cancel: () => Snackbar.error('cancel'),
-	close: () => Snackbar.info('close')
-}
-const createAction = async () => actions[await Dialog('兰亭临帖 行书如行云流水')]()
-const endSignIn = () => {
-	createAction()
+const signChange = (data: string) => {
+	const item = courseInfo.stuSignAtn.find(item => item.icid === data)
+	if (item) {
+		item.state = 1
+	}
 }
 </script>
 

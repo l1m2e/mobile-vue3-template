@@ -8,7 +8,10 @@ declare global {
   const $ref: typeof import('vue/macros')['$ref']
   const $shallowRef: typeof import('vue/macros')['$shallowRef']
   const $toRef: typeof import('vue/macros')['$toRef']
+  const Dialog: typeof import('@varlet/ui')['Dialog']
   const EffectScope: typeof import('vue')['EffectScope']
+  const Picker: typeof import('@varlet/ui')['Picker']
+  const Snackbar: typeof import('@varlet/ui')['Snackbar']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
   const computed: typeof import('vue')['computed']
@@ -279,7 +282,10 @@ declare module '@vue/runtime-core' {
     readonly $ref: UnwrapRef<typeof import('vue/macros')['$ref']>
     readonly $shallowRef: UnwrapRef<typeof import('vue/macros')['$shallowRef']>
     readonly $toRef: UnwrapRef<typeof import('vue/macros')['$toRef']>
+    readonly Dialog: UnwrapRef<typeof import('@varlet/ui')['Dialog']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
+    readonly Picker: UnwrapRef<typeof import('@varlet/ui')['Picker']>
+    readonly Snackbar: UnwrapRef<typeof import('@varlet/ui')['Snackbar']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>

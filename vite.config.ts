@@ -1,5 +1,4 @@
 /// <reference types="vitest" />
-
 import path from 'path'
 import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
@@ -23,9 +22,8 @@ export default defineConfig({
 		// https://github.com/hannoeru/vite-plugin-pages
 		Pages(),
 
-		// https://github.com/antfu/unplugin-auto-import
 		AutoImport({
-			imports: ['vue', 'vue/macros', 'vue-router', '@vueuse/core'],
+			imports: ['vue', 'vue/macros', 'vue-router', '@vueuse/core', { '@varlet/ui': ['Picker', 'Dialog', 'Snackbar'] }],
 			dts: true,
 			dirs: ['./src/composables'],
 			vueTemplate: true
