@@ -1,12 +1,13 @@
 import { useWebSocket, UseWebSocketOptions } from '@vueuse/core'
-const baseURL = 'ws://192.168.5.168:8080'
+const baseURL = 'ws://192.168.88.123:8080'
 export const ws = (URL: string, options?: UseWebSocketOptions) => {
 	const defaultOptions: UseWebSocketOptions = {
 		onMessage(ws, event) {
 			res.data.value = JSON.parse(event.data)
+			console.log('输出')
 		},
 		onDisconnected(ws, event) {
-			Snackbar.error('服务器连接失败请重试')
+			Snackbar.error('服务器连接失败')
 		},
 		autoReconnect: true
 	}
