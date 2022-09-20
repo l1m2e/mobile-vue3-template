@@ -21,15 +21,16 @@ const onConfirm = (e: any) => {
 	console.log(signTime.value)
 }
 
+//prettier-ignore
 const courseInfo = reactive<IcourseInfo>({
-	startTime: 0, // 开始时间戳
-	endTime: 0, // 结束时间戳
+	startTime: 0,    // 开始时间戳
+	endTime: 0,      // 结束时间戳
 	teacherName: '', // 老师名字
-	courseName: '', // 课程名字
-	className: '', // 教室名字
-	stuSignAtn: [], // 学生列表 包含签到状态
-	state: '', // 签到状态
-	signEndTime: 0 // 签到结束
+	courseName: '',  // 课程名字
+	className: '',   // 教室名字
+	stuSignAtn: [],  // 学生列表 包含签到状态
+	state: '',       // 签到状态
+	signEndTime: 0   // 签到结束
 })
 
 // 缺席数组
