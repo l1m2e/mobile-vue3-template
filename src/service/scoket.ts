@@ -1,5 +1,6 @@
 import { useWebSocket, UseWebSocketOptions } from '@vueuse/core'
-const baseURL = 'ws://192.168.88.123:8080'
+import host from '~/config/host'
+const baseURL = `ws://${host}`
 export const ws = (URL: string, options?: UseWebSocketOptions) => {
 	const defaultOptions: UseWebSocketOptions = {
 		onMessage(ws, event) {
@@ -9,7 +10,7 @@ export const ws = (URL: string, options?: UseWebSocketOptions) => {
 		onDisconnected(ws, event) {
 			Snackbar.error('服务器连接失败')
 		},
-		autoReconnect: true
+		heartbeat: true
 	}
 	const res = useWebSocket(`${baseURL}${URL}`, { ...defaultOptions, ...options })
 	// 以JSON的格式发送

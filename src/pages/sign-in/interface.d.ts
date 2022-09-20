@@ -7,6 +7,8 @@ export interface IcourseInfo {
 	courseName: string
 	className: string
 	stuSignAtn: Array<IstuInfo>
+	state: string
+	signEndTime: number
 }
 interface IstuInfo {
 	name: string

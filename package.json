@@ -2,8 +2,8 @@
   "private": true,
   "packageManager": "pnpm@7.4.0",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite --port 3333 --open",
+    "build": "vite build --mode production",
+    "dev": "vite --port 3333 --open --mode development",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
     "preview": "vite preview",
@@ -17,7 +17,7 @@
     "axios": "^0.27.2",
     "dayjs": "^1.11.5",
     "sass": "^1.54.9",
-    "vue": "^3.2.38",
+    "vue": "^3.2.39",
     "vue-router": "^4.1.5"
   },
   "devDependencies": {

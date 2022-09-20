@@ -9,5 +9,9 @@ export const getUrlParams = () => {
 			params[item[0]] = item[1]
 		})
 	}
+	if (params.Terminalmac) {
+		params.Terminalmac = decodeURIComponent(params.Terminalmac)
+		params.Terminalmac = params.Terminalmac.toLowerCase() //转换成小写
+	}
 	return params
 }

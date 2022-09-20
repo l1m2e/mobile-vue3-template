@@ -1,8 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 
-const URL: string = 'http://192.168.88.123:8080/'
+import host from '~/config/host'
+const baseURL = `http://${host}`
+
 const request = axios.create({
-	baseURL: URL,
+	baseURL: baseURL,
 	timeout: 1000
 })
 
