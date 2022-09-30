@@ -42,7 +42,7 @@ const signInArr = computed(() => courseInfo.stuSignAtn.filter(item => item.state
 const isStart = ref(true) // true 未开启签到 ，false 已开始签到
 const getCourseInfo = async () => {
 	const params = {
-		cardId: 'P1000100',
+		cardId: 'admin',
 		time: +dayjs(),
 		interfaceNum: '47-1'
 	}
@@ -56,7 +56,7 @@ const getCourseInfo = async () => {
 getCourseInfo()
 
 // webscoket
-const { data, send } = ws('/IClassWebsocket/Teacher/P1000100')
+const { data, send } = ws('/IClassWebsocket/Teacher/admin')
 
 watch(data, (v: IScoketMsg) => {
 	console.log('%c监听到变更', 'color: white; background-color: #007acc;', v)
@@ -125,11 +125,13 @@ const endSignIn = async () => {
 		isStart.value = true
 	}
 }
+
 // 自动签到结束
 const autoEndSign = () => {
 	Snackbar.success('签到已结束')
 	isStart.value = true
 }
+
 // 学生签到触发
 const signChange = (data: string) => {
 	const item = courseInfo.stuSignAtn.find(item => item.icid === data)
