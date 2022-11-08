@@ -23,7 +23,7 @@ export default defineConfig({
 		Pages(),
 
 		AutoImport({
-			imports: ['vue', 'vue/macros', 'vue-router', '@vueuse/core', { '@varlet/ui': ['Picker', 'Dialog', 'Snackbar'] }],
+			imports: ['vue', 'vue/macros', 'vue-router', '@vueuse/core', { '@varlet/ui': ['Picker', 'Dialog', 'Snackbar'], '~/api': [['*', 'api']] }],
 			dts: true,
 			dirs: ['./src/composables'],
 			vueTemplate: true

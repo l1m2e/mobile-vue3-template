@@ -1,21 +1,21 @@
 <script lang="ts" setup>
-import { getCourseInfoApi } from '~/api'
 import { setReactive } from '~/utils/setReactve'
 import dayjs from 'dayjs'
 import { IcourseInfo, IScoketMsg } from './interface'
-import { ws } from '~/service/scoket'
 import manIcon from '~/assets/img/txnan.png'
 import girlIcon from '~/assets/img/txnv.png'
 import { getUrlParams } from '~/utils/getUrlParams'
 
 const urlParams = getUrlParams()
 console.log(urlParams)
+
 const signTime = ref(5) //默认签到时间
 const columns = [[5, 10, 15, 20, 25, 30, 35]]
 const picker = async () => {
 	await Picker({ columns, title: '请选择时间(分钟)', onConfirm })
 }
 const signTimeTimestamp = computed(() => signTime.value * 60 * 1000)
+
 const onConfirm = (e: any) => {
 	signTime.value = e[0]
 	console.log(signTime.value)
@@ -34,97 +34,101 @@ const courseInfo = reactive<IcourseInfo>({
 })
 
 // 缺席数组
-const absentArr = computed(() => courseInfo.stuSignAtn.filter(item => item.state === 1))
+const absentArr = computed(() => courseInfo.stuSignAtn.filter((item) => item.state === 1))
 // 签到数组
-const signInArr = computed(() => courseInfo.stuSignAtn.filter(item => item.state === 0))
+const signInArr = computed(() => courseInfo.stuSignAtn.filter((item) => item.state === 0))
 
 // 获取课程信息
 const isStart = ref(true) // true 未开启签到 ，false 已开始签到
 const getCourseInfo = async () => {
-	const params = {
-		cardId: 'admin',
-		time: +dayjs(),
-		interfaceNum: '47-1'
-	}
-	const res = await getCourseInfoApi(params)
-	if (Object.keys(res).length === 0) {
-		console.log('没课 显示没课页面')
-	}
-	setReactive(courseInfo, res)
+	const res = await api.getCourseInfoApi({ cardId: 'P1000200' }) // 老师卡号 暂时写死
+	if (Object.keys(res.data).length === 0) return console.log('没课 显示没课页面')
+	setReactive(courseInfo, res.data)
 	isStart.value = ['未开始', '已结束'].includes(courseInfo.state)
 }
 getCourseInfo()
 
+//发起签到
+const startSign = async () => {
+	const params = {
+		classRoomMac: '5156415645641', //教室Mac 暂时写死
+		jobNum: 'P1000200',
+		signEndTime: +dayjs() + signTimeTimestamp.value
+	}
+	const res = await api.startSign(params)
+	if (res.status === 400) return Snackbar.error('发起签到失败')
+}
+
+// const scoket = api.signInIo({ cardId: 'P1000100' })
 // webscoket
-const { data, send } = ws('/IClassWebsocket/Teacher/admin')
+// const { data, send } = ws('/IClassWebsocket/Teacher/admin')
+// watch(data, (v: IScoketMsg) => {
+// 	console.log('%c监听到变更', 'color: white; background-color: #007acc;', v)
+// 	switch (v.type) {
+// 		case 'sign_change':
+// 			signChange(v.data)
+// 			break
+// 		case 'successSign':
+// 			startSignInSuccess()
+// 			break
+// 		case 'error':
+// 			msgError(v.data)
+// 			break
+// 		case 'success':
+// 			break
+// 		case 'repeatWarning':
+// 			reSignIn()
+// 			break
+// 	}
+// })
 
-watch(data, (v: IScoketMsg) => {
-	console.log('%c监听到变更', 'color: white; background-color: #007acc;', v)
-	switch (v.type) {
-		case 'sign_change':
-			signChange(v.data)
-			break
-		case 'successSign':
-			startSignInSuccess()
-			break
-		case 'error':
-			msgError(v.data)
-			break
-		case 'success':
-			break
-		case 'repeatWarning':
-			reSignIn()
-			break
-	}
-})
+// // 发起签到
+// const startSignIn = (e: any, type = 'startSign') => {
+// 	const msg = {
+// 		type,
+// 		data: {
+// 			classRoomMac: '16:02:0a:0e:20:2e',
+// 			signStartTime: +dayjs(),
+// 			signEndTime: +dayjs() + signTimeTimestamp.value
+// 		}
+// 	}
+// 	send(msg)
+// }
 
-// 发起签到
-const startSignIn = (e: any, type = 'startSign') => {
-	const msg = {
-		type,
-		data: {
-			classRoomMac: '16:02:0a:0e:20:2e',
-			signStartTime: +dayjs(),
-			signEndTime: +dayjs() + signTimeTimestamp.value
-		}
-	}
-	send(msg)
-}
+// const startSignInSuccess = () => {
+// 	getCourseInfo()
+// 	Snackbar.success('发起签到成功')
+// }
+// // 重新签到
+// const reSignIn = async () => {
+// 	const res = await Dialog({
+// 		title: '警告',
+// 		message: '重新发起需要学生重新签到'
+// 	})
+// 	if (res == 'confirm') {
+// 		startSignIn(null, 'startSignCoerce') // 发起签到强制
+// 		isStart.value = false
+// 	}
+// }
 
-const startSignInSuccess = () => {
-	getCourseInfo()
-	Snackbar.success('发起签到成功')
-}
-// 重新签到
-const reSignIn = async () => {
-	const res = await Dialog({
-		title: '警告',
-		message: '重新发起需要学生重新签到'
-	})
-	if (res == 'confirm') {
-		startSignIn(null, 'startSignCoerce') // 发起签到强制
-		isStart.value = false
-	}
-}
-
-// 结束签到按钮
-const endSignIn = async () => {
-	const res = await Dialog({
-		title: '警告',
-		message: '是否要结束签到'
-	})
-	if (res == 'confirm') {
-		const msg = {
-			type: 'endSign',
-			data: {
-				startTime: courseInfo.startTime
-			}
-		}
-		send(msg)
-		Snackbar.success('签到已结束')
-		isStart.value = true
-	}
-}
+// // 结束签到按钮
+// const endSignIn = async () => {
+// 	const res = await Dialog({
+// 		title: '警告',
+// 		message: '是否要结束签到'
+// 	})
+// 	if (res == 'confirm') {
+// 		const msg = {
+// 			type: 'endSign',
+// 			data: {
+// 				startTime: courseInfo.startTime
+// 			}
+// 		}
+// 		send(msg)
+// 		Snackbar.success('签到已结束')
+// 		isStart.value = true
+// 	}
+// }
 
 // 自动签到结束
 const autoEndSign = () => {
@@ -132,17 +136,17 @@ const autoEndSign = () => {
 	isStart.value = true
 }
 
-// 学生签到触发
-const signChange = (data: string) => {
-	const item = courseInfo.stuSignAtn.find(item => item.icid === data)
-	if (item) {
-		item.state = 0
-	}
-}
+// // 学生签到触发
+// const signChange = (data: string) => {
+// 	const item = courseInfo.stuSignAtn.find((item) => item.icid === data)
+// 	if (item) {
+// 		item.state = 0
+// 	}
+// }
 
-const msgError = (e: string) => {
-	Snackbar.error(e)
-}
+// const msgError = (e: string) => {
+// 	Snackbar.error(e)
+// }
 
 onBeforeUnmount(() => {
 	Snackbar.error('离开页面')
@@ -169,7 +173,7 @@ onBeforeUnmount(() => {
 			</div>
 			<div class="text">
 				<div i-carbon:time></div>
-				<span> 时间：{{ dayjs(courseInfo.startTime).format('HH:mm') }}~{{ dayjs(courseInfo.endTime).format('HH:mm') }} </span>
+				<span>时间：{{ dayjs(courseInfo.startTime).format('HH:mm') }}~{{ dayjs(courseInfo.endTime).format('HH:mm') }}</span>
 			</div>
 		</div>
 	</div>
@@ -178,14 +182,14 @@ onBeforeUnmount(() => {
 			<var-button type="primary" font-700 block flex-1 @click="picker" v-if="isStart">
 				<template center>
 					<div i-carbon:time></div>
-					<span ml-2> 签到时间</span>
+					<span ml-2>签到时间</span>
 					<span ml-2>{{ signTime }}分钟</span>
 				</template>
 			</var-button>
 			<var-button type="success" font-700 block flex-1 v-else>
 				<var-countdown :time="courseInfo.signEndTime - +dayjs()" format="剩余 mm 分 ss 秒" @end="autoEndSign" />
 			</var-button>
-			<var-button ml-1 type="success" font-700 block flex-1 @click="startSignIn" v-if="isStart">开始签到</var-button>
+			<var-button ml-1 type="success" font-700 block flex-1 @click="startSign" v-if="isStart">开始签到</var-button>
 			<var-button ml-1 type="danger" font-700 block flex-1 @click="endSignIn" v-else>结束签到</var-button>
 		</div>
 		<div class="title">

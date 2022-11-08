@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 import host from '~/config/host'
-const baseURL = `http://${host}`
+const baseURL = `http://${host}:8080/`
 
 const request = axios.create({
 	baseURL: baseURL,
@@ -21,8 +21,7 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
 	function (res: AxiosResponse) {
-		const { data } = res
-		return data
+		return res
 	},
 	function (error) {
 		// 超出 2xx 范围的状态码都会触发该函数。

@@ -1,3 +1,4 @@
+// 从 Url 获取参数
 export const getUrlParams = () => {
 	let url = document.location.toString()
 	let arrObj = url.split('?')

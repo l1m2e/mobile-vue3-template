@@ -12,6 +12,7 @@ declare global {
   const EffectScope: typeof import('vue')['EffectScope']
   const Picker: typeof import('@varlet/ui')['Picker']
   const Snackbar: typeof import('@varlet/ui')['Snackbar']
+  const api: typeof import('~/api')
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
   const computed: typeof import('vue')['computed']
@@ -286,6 +287,7 @@ declare module '@vue/runtime-core' {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly Picker: UnwrapRef<typeof import('@varlet/ui')['Picker']>
     readonly Snackbar: UnwrapRef<typeof import('@varlet/ui')['Snackbar']>
+    readonly api: UnwrapRef<typeof import('~/api')>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>

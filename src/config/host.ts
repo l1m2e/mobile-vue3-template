@@ -1,6 +1,6 @@
 const model = import.meta.env.MODE === 'development' ? true : false
-let baseURL = '120.76.223.28:8086/'
+let baseURL = '192.168.88.123'
 if (!model) {
-	baseURL = `${window.location.host}`
+	baseURL = `${window.location.hostname}`
 }
 export default baseURL
