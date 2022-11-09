@@ -1,5 +1,5 @@
-import { io } from 'socket.io-client'
 import host from '~/config/host'
+const io = require('socket.io-client')
 interface ICardId {
 	cardId: string
 }

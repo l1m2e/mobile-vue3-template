@@ -1,22 +1,21 @@
-import { type } from 'os'
-
 export interface IcourseInfo {
 	startTime: number
 	endTime: number
 	teacherName: string
 	courseName: string
 	className: string
-	stuSignAtn: Array<IstuInfo>
+	stuInfo: Array<IstuInfo>
 	state: string
 	signEndTime: number
+	aid: number
+	stuSignAts: Array<string>
+}
+export interface IIoRes {
+	message: any
+	type: string
 }
 interface IstuInfo {
-	name: string
+	studentId: string
 	sex: number
-	state: number
-	icid: string
-}
-interface IScoketMsg {
-	type: string
-	data: any
+	name: string
 }

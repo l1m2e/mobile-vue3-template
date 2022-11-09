@@ -6,6 +6,7 @@ import Pages from 'vite-plugin-pages'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Unocss from 'unocss/vite'
+import requireTransform from 'vite-plugin-require-transform'
 import { VarletUIResolver } from 'unplugin-vue-components/resolvers'
 
 export default defineConfig({
@@ -18,6 +19,7 @@ export default defineConfig({
 		Vue({
 			reactivityTransform: true
 		}),
+		requireTransform({ fileRegex: /.ts$|.tsx$|.vue$/ }),
 
 		// https://github.com/hannoeru/vite-plugin-pages
 		Pages(),
