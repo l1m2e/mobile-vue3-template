@@ -53,7 +53,7 @@ getCourseInfo()
 //发起签到
 const startSign = async () => {
 	const params = {
-		classRoomMac: '5156415645641', //教室Mac 暂时写死
+		classRoomMac: '22:44:84:2b:8b:70', //教室Mac 暂时写死
 		jobNum: 'P1000100',
 		signEndTime: +dayjs() + signTimeTimestamp.value
 	}

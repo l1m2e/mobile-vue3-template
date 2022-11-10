@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 import host from '~/config/host'
-const baseURL = `http://${host}:8080/`
+const baseURL = `http://${host}:8081/`
 
 const request = axios.create({
 	baseURL: baseURL,
