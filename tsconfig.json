@@ -9,6 +9,7 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"moduleResolution": "node",
+		"suppressImplicitAnyIndexErrors": true,
 		"resolveJsonModule": true,
 		"noUnusedLocals": true,
 		"strictNullChecks": true,

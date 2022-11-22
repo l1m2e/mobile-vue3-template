@@ -5,7 +5,7 @@ import { IcourseInfo, IIoRes } from './interface'
 import manIcon from '~/assets/img/txnan.png'
 import girlIcon from '~/assets/img/txnv.png'
 import { getUrlParams } from '~/utils/getUrlParams'
-
+import empty from '~/components/empty-page/index.vue'
 const urlParams = getUrlParams()
 console.log('url参数', urlParams)
 
@@ -41,10 +41,11 @@ const absentArr = computed(() => courseInfo.stuInfo.filter((item) => courseInfo.
 const signInArr = computed(() => courseInfo.stuInfo.filter((item) => !courseInfo.stuSignAts.includes(item.studentId)))
 
 // 获取课程信息
+const isCourse = ref(false)
 const isStart = ref(true) // true 未开启签到 ，false 已开始签到
 const getCourseInfo = async () => {
-	const res = await api.getCourseInfoApi({ cardId: 'P1000100' }) // 老师卡号 暂时写死
-	if (Object.keys(res.data).length === 0) return console.log('没课 显示没课页面')
+	const res = await api.getCourseInfoApi({ cardId: urlParams.Teacher })
+	if (Object.keys(res.data).length === 0) return (isCourse.value = true)
 	setReactive(courseInfo, res.data)
 	isStart.value = ['未开始', '已结束'].includes(courseInfo.state)
 }
@@ -53,8 +54,8 @@ getCourseInfo()
 //发起签到
 const startSign = async () => {
 	const params = {
-		classRoomMac: '22:44:84:2b:8b:70', //教室Mac 暂时写死
-		jobNum: 'P1000100',
+		classRoomMac: urlParams.Terminalmac, //教室Mac
+		jobNum: urlParams.Teacher, // 老师是工号
 		signEndTime: +dayjs() + signTimeTimestamp.value
 	}
 	const res = await api.startSign(params)
@@ -96,58 +97,61 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-	<div w-screen h-30 p-1 color-black text-5>
-		<div class="text-box">
-			<div class="text">
-				<div i-carbon:user-speaker></div>
-				<span>老师：{{ courseInfo.teacherName }}</span>
+	<empty v-if="isCourse" text="暂无课程"></empty>
+	<div v-else>
+		<div w-screen h-30 p-1 color-black text-5>
+			<div class="text-box">
+				<div class="text">
+					<div i-carbon:user-speaker></div>
+					<span>老师：{{ courseInfo.teacherName }}</span>
+				</div>
+				<div class="text">
+					<div i-carbon:notebook></div>
+					<span>课程：{{ courseInfo.courseName }}</span>
+				</div>
 			</div>
-			<div class="text">
-				<div i-carbon:notebook></div>
-				<span>课程：{{ courseInfo.courseName }}</span>
-			</div>
-		</div>
-		<div class="text-box">
-			<div class="text">
-				<div i-carbon:calendar></div>
-				<span>班级：{{ courseInfo.className }}</span>
-			</div>
-			<div class="text">
-				<div i-carbon:time></div>
-				<span>时间：{{ dayjs(courseInfo.startTime).format('HH:mm') }}~{{ dayjs(courseInfo.endTime).format('HH:mm') }}</span>
-			</div>
-		</div>
-	</div>
-	<div h-auto w-screen p-1>
-		<div flex>
-			<var-button type="primary" font-700 block flex-1 @click="picker" v-if="isStart">
-				<template center>
+			<div class="text-box">
+				<div class="text">
+					<div i-carbon:calendar></div>
+					<span>班级：{{ courseInfo.className }}</span>
+				</div>
+				<div class="text">
 					<div i-carbon:time></div>
-					<span ml-2>签到时间</span>
-					<span ml-2>{{ signTime }}分钟</span>
-				</template>
-			</var-button>
-			<var-button type="success" font-700 block flex-1 v-else>
-				<var-countdown :time="courseInfo.signEndTime - +dayjs()" format="剩余 mm 分 ss 秒" @end="autoEndSign" />
-			</var-button>
-			<var-button ml-1 type="success" font-700 block flex-1 @click="startSign" v-if="isStart">开始签到</var-button>
-			<var-button ml-1 type="danger" font-700 block flex-1 @click="endSign" v-else>结束签到</var-button>
-		</div>
-		<div class="title">
-			<div>总人数：{{ courseInfo.stuInfo.length }}</div>
-			<div>实到人数：{{ signInArr.length }}</div>
-		</div>
-		<div class="content-box">
-			<div center flex-col v-for="item in signInArr">
-				<img :src="item.sex ? manIcon : girlIcon" w-10 h-10 />
-				<div center text-1 mt-1>{{ item.name }}</div>
+					<span>时间：{{ dayjs(courseInfo.startTime).format('HH:mm') }}~{{ dayjs(courseInfo.endTime).format('HH:mm') }}</span>
+				</div>
 			</div>
 		</div>
-		<div class="title" center>缺席人数{{ absentArr.length }}</div>
-		<div class="content-box">
-			<div center flex-col v-for="item in absentArr">
-				<img :src="item.sex ? manIcon : girlIcon" w-10 h-10 />
-				<div center text-1 mt-1>{{ item.name }}</div>
+		<div h-auto w-screen p-1>
+			<div flex>
+				<var-button type="primary" font-700 block flex-1 @click="picker" v-if="isStart">
+					<template center>
+						<div i-carbon:time></div>
+						<span ml-2>签到时间</span>
+						<span ml-2>{{ signTime }}分钟</span>
+					</template>
+				</var-button>
+				<var-button type="success" font-700 block flex-1 v-else>
+					<var-countdown :time="courseInfo.signEndTime - +dayjs()" format="剩余 mm 分 ss 秒" @end="autoEndSign" />
+				</var-button>
+				<var-button ml-1 type="success" font-700 block flex-1 @click="startSign" v-if="isStart">开始签到</var-button>
+				<var-button ml-1 type="danger" font-700 block flex-1 @click="endSign" v-else>结束签到</var-button>
+			</div>
+			<div class="title">
+				<div>总人数：{{ courseInfo.stuInfo.length }}</div>
+				<div>实到人数：{{ signInArr.length }}</div>
+			</div>
+			<div class="content-box">
+				<div center flex-col v-for="item in signInArr">
+					<img :src="item.sex ? manIcon : girlIcon" w-10 h-10 />
+					<div center text-1 mt-1>{{ item.name }}</div>
+				</div>
+			</div>
+			<div class="title" center>缺席人数{{ absentArr.length }}</div>
+			<div class="content-box">
+				<div center flex-col v-for="item in absentArr">
+					<img :src="item.sex ? manIcon : girlIcon" w-10 h-10 />
+					<div center text-1 mt-1>{{ item.name }}</div>
+				</div>
 			</div>
 		</div>
 	</div>

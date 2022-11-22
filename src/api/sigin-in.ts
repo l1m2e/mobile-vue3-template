@@ -1,10 +1,14 @@
-import axios from '~/service/http'
-import { IStartSign,IStopSign } from './types'
+import { request, io } from '~/service'
+import { IStartSign, IStopSign, ICardId } from './types'
+import { baseUrl } from '~/config/host'
+
 // 获取上课信息
-export const getCourseInfoApi = (data: any) => axios.get('/teacherClassInteract/attendance/getCourseInfo', { params: data })
+export const getCourseInfoApi = (data: any) => request.get('/teacherClassInteract/attendance/getCourseInfo', { params: data })
 // 开始签到
-export const startSign = (data: IStartSign) => axios.post('/teacherClassInteract/attendance/startSign', data)
+export const startSign = (data: IStartSign) => request.post('/teacherClassInteract/attendance/startSign', data)
 // 获取学生签到记录
-export const getUserAtnApi = (data: any) => axios.get('/Interact/getUserAtn', { params: data })
+export const getUserAtnApi = (data: any) => request.get('/Interact/getUserAtn', { params: data })
 // 结束签到
-export const stopSign = (data: IStopSign) => axios.get('/teacherClassInteract/attendance/stopSign', { params: data })
+export const stopSign = (data: IStopSign) => request.get('/teacherClassInteract/attendance/stopSign', { params: data })
+// 签到
+export const signInIo = (cardId: ICardId) => io(`${baseUrl.websocketUrl}CInteractTea`, { query: cardId, transports: ['websocket'] })

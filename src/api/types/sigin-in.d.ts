@@ -9,3 +9,7 @@ export interface IStopSign {
 	className: string
 	cardId: string
 }
+
+export interface ICardId {
+	cardId: string
+}

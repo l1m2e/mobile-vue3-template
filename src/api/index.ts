@@ -1,2 +1,2 @@
 export * from './sigin-in'
-export * from './scoket.io'
+export * from '../service/scoket.io'

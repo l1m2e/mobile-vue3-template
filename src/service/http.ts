@@ -1,10 +1,9 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 
-import host from '~/config/host'
-const baseURL = `http://${host}:8081/`
+import { baseUrl } from '~/config/host'
 
-const request = axios.create({
-	baseURL: baseURL,
+export const request = axios.create({
+	baseURL: baseUrl.httpUrl,
 	timeout: 1000
 })
 
@@ -30,5 +29,3 @@ request.interceptors.response.use(
 		return Promise.reject(error)
 	}
 )
-
-export default request
