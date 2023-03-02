@@ -11,4 +11,6 @@ export const getUserAtnApi = (data: any) => request.get('/Interact/getUserAtn', 
 // 结束签到
 export const stopSign = (data: IStopSign) => request.get('/teacherClassInteract/attendance/stopSign', { params: data })
 // 签到
-export const signInIo = (cardId: ICardId) => io(`${baseUrl.websocketUrl}CInteractTea`, { query: cardId, transports: ['websocket'] })
+export const signInIo = (cardId: ICardId) => io(`${baseUrl.websocketUrl}/CInteractTea`, { query: cardId, transports: ['websocket'] })
+// 获取ws连接
+export const getWsLink = () => request.get('/common/address')

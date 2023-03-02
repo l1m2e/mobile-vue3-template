@@ -4,16 +4,21 @@
 	</main>
 </template>
 <script setup>
-import { baseUrl } from './config/host'
-import { request } from '~/service'
-const model = import.meta.env.MODE === 'development' ? true : false
+import { useUrlSearchParams } from '@vueuse/core'
+import { urlParamsStore } from '~/store/urlParamsStore'
+import { setReactive } from './utils/objectTool'
+//获取scoket链接
 const getWebScoketBaseUrl = async () => {
+	const model = import.meta.env.MODE === 'development' ? true : false
 	if (model) return // 若是开发模式不需要去请求ws的路径
-	const res = await request.get(`${baseUrl.httpUrl}/common/address`)
+	const res = api.getWsLink()
 	if (res.status === 200) {
 		baseUrl.websocketUrl = res.data.websocketUrl
-		console.log('[ baseUrl ] >', baseUrl)
 	}
 }
 getWebScoketBaseUrl()
+
+//获取url上的参数 保存到全局
+const urlParams = useUrlSearchParams('hash')
+setReactive(urlParamsStore, urlParams)
 </script>

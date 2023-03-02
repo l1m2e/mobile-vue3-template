@@ -4,7 +4,8 @@ import { baseUrl } from '~/config/host'
 
 export const request = axios.create({
 	baseURL: baseUrl.httpUrl,
-	timeout: 1000
+	timeout: 1000,
+	validateStatus: (status) => status < 500
 })
 
 request.interceptors.request.use(

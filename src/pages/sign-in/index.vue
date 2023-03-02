@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { setReactive } from '~/utils/setReactve'
+import { setReactive } from '~/utils/objectTool'
 import dayjs from 'dayjs'
 import { IcourseInfo, IIoRes } from './interface'
 import manIcon from '~/assets/img/txnan.png'
@@ -8,6 +8,19 @@ import { getUrlParams } from '~/utils/getUrlParams'
 import empty from '~/components/empty-page/index.vue'
 const urlParams = getUrlParams()
 console.log('url参数', urlParams)
+
+//检查url 参数是否存在
+let isTeacher = false
+let isTerminalmac = false
+const checkUrlParams = () => {
+	if (!urlParams.Teacher) {
+		isTeacher = true
+	}
+	if (!urlParams.Terminalmac) {
+		isTerminalmac = true
+	}
+}
+checkUrlParams()
 
 const signTime = ref(5) //默认签到时间
 const columns = [[5, 10, 15, 20, 25, 30, 35]]
@@ -21,7 +34,7 @@ const onConfirm = (e: any) => {
 	console.log(signTime.value)
 }
 
-//prettier-ignore
+// prettier-ignore
 const courseInfo = reactive<IcourseInfo>({
 	startTime: 0,    // 开始时间戳
 	endTime: 0,      // 结束时间戳
@@ -45,9 +58,13 @@ const isCourse = ref(false)
 const isStart = ref(true) // true 未开启签到 ，false 已开始签到
 const getCourseInfo = async () => {
 	const res = await api.getCourseInfoApi({ cardId: urlParams.Teacher })
-	if (Object.keys(res.data).length === 0) return (isCourse.value = true)
-	setReactive(courseInfo, res.data)
-	isStart.value = ['未开始', '已结束'].includes(courseInfo.state)
+	if (res.status === 200) {
+		setReactive(courseInfo, res.data)
+		isStart.value = ['未开始', '已结束'].includes(courseInfo.state)
+		return
+	}
+	console.log('hello')
+	isCourse.value = true
 }
 getCourseInfo()
 
@@ -97,7 +114,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-	<empty v-if="isCourse" text="暂无课程"></empty>
+	<empty v-if="isTeacher" type="error" text="没有卡号"></empty>
+	<empty v-else-if="isTerminalmac" type="error" text="没有MAC"></empty>
+	<empty v-else-if="isCourse" text="暂无课程"></empty>
 	<div v-else>
 		<div w-screen h-30 p-1 color-black text-5>
 			<div class="text-box">
