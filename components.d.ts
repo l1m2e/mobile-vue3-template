@@ -11,9 +11,14 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VarButton: typeof import('@varlet/ui')['_ButtonComponent']
+    VarCell: typeof import('@varlet/ui')['_CellComponent']
+    VarChip: typeof import('@varlet/ui')['_ChipComponent']
     VarCollapse: typeof import('@varlet/ui')['_CollapseComponent']
     VarCollapseItem: typeof import('@varlet/ui')['_CollapseItemComponent']
     VarCountdown: typeof import('@varlet/ui')['_CountdownComponent']
     VarLoading: typeof import('@varlet/ui')['_LoadingComponent']
+    VarPopup: typeof import('@varlet/ui')['_PopupComponent']
+    VarSwipe: typeof import('@varlet/ui')['_SwipeComponent']
+    VarSwipeItem: typeof import('@varlet/ui')['_SwipeItemComponent']
   }
 }
