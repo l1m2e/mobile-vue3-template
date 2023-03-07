@@ -4,7 +4,9 @@ import { setReactive } from '~/utils'
 import empty from '~/components/empty-page/index.vue'
 import issueInfoPopup from './components/issue-info-popup.vue'
 import richTextPicture from './components/rich-text-picture.vue'
-// import dayjs from 'dayjs'
+import pushIssueDialog from './components/push-issue-dialog.vue'
+import dayjs from 'dayjs'
+
 // 课程信息对象
 const preparingInfo = reactive({
 	classDeviceName: '', // 教室
@@ -30,6 +32,7 @@ const getPreparingInfo = async () => {
 		setReactive(preparingInfo, res.data)
 		if (preparingInfo.id) {
 			getIsuueList()
+			getTasklog(preparingInfo.id)
 		}
 	}
 	loading.value = false
@@ -57,7 +60,40 @@ const emptyTitle = computed(() => {
 	if (preparingInfo.id === 0) return '题库无数据当前课程暂未备课'
 })
 
+//发布问题
+const pushIssue = async (sid: number, startTime: number, endTime: number) => {
+	const params = {
+		pid: preparingInfo.id,
+		sid,
+		startTime,
+		endTime,
+		jobNum: preparingInfo.jobNum,
+		type: 2
+	}
+	const res = await api.pushIssue(params)
+	if (res.status === 200) {
+		Snackbar.success('题目发布成功')
+		console.log(res)
+	} else {
+		Snackbar.error('发布问题失败')
+	}
+}
+const pushIssueDialogConfirm = (confirmInfo: { id: number; endTime: number }) => {
+	const startTimestamp = dayjs().valueOf()
+	const endTimestamp = startTimestamp + confirmInfo.endTime * 60000
+	console.log(confirmInfo.id, startTimestamp, endTimestamp)
+	pushIssue(confirmInfo.id, startTimestamp, endTimestamp)
+}
+const pushIssueDialogRef = ref()
 const issueInfoPopupRef = ref()
+
+//获取任务记录进行中
+const getTasklog = async (pid: number) => {
+	const res = await api.getTasklogById({ pid, timeType: 2 })
+	if (res.status === 200) {
+		console.log(res)
+	}
+}
 </script>
 
 <template>
@@ -70,7 +106,7 @@ const issueInfoPopupRef = ref()
 				</div>
 				<div>
 					<var-button size="small" type="info" @click="issueInfoPopupRef.open(item.id)">详细信息</var-button>
-					<var-button size="small" type="success" ml-10px>发布题目</var-button>
+					<var-button size="small" type="success" ml-10px @click="pushIssueDialogRef.open(item.id)">发布题目</var-button>
 				</div>
 			</div>
 		</div>
@@ -88,7 +124,6 @@ const issueInfoPopupRef = ref()
 			right-0
 			bg-white></empty>
 	</var-loading>
+	<pushIssueDialog ref="pushIssueDialogRef" @confirm="pushIssueDialogConfirm"></pushIssueDialog>
 	<issueInfoPopup ref="issueInfoPopupRef"></issueInfoPopup>
 </template>
-
-<style scoped></style>

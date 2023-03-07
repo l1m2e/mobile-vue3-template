@@ -74,11 +74,13 @@ const getIssueInfo = async (id: number) => {
 					{{ issueInfo.answer[0] === 'A' ? '对' : '错' }}
 				</div>
 			</div>
-			<h1 class="title">答案解析</h1>
-			<div class="card">
-				<div v-html="issueInfo.analysis"></div>
+			<div v-if="issueInfo.analysis !== ''">
+				<h1 class="title">答案解析</h1>
+				<div class="card">
+					<div v-html="issueInfo.analysis"></div>
+				</div>
+				<footer class="h-100px w-100%"></footer>
 			</div>
-			<footer class="h-100px w-100%"></footer>
 		</div>
 	</var-popup>
 </template>

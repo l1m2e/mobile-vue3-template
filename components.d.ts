@@ -16,9 +16,13 @@ declare module '@vue/runtime-core' {
     VarCollapse: typeof import('@varlet/ui')['_CollapseComponent']
     VarCollapseItem: typeof import('@varlet/ui')['_CollapseItemComponent']
     VarCountdown: typeof import('@varlet/ui')['_CountdownComponent']
+    VarDialog: typeof import('@varlet/ui')['_DialogComponent']
+    VarIcon: typeof import('@varlet/ui')['_IconComponent']
     VarLoading: typeof import('@varlet/ui')['_LoadingComponent']
     VarPopup: typeof import('@varlet/ui')['_PopupComponent']
+    VarSlider: typeof import('@varlet/ui')['_SliderComponent']
     VarSwipe: typeof import('@varlet/ui')['_SwipeComponent']
     VarSwipeItem: typeof import('@varlet/ui')['_SwipeItemComponent']
+    VarTimePicker: typeof import('@varlet/ui')['_TimePickerComponent']
   }
 }

@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-
+import { Snackbar } from '@varlet/ui'
 import { baseUrl } from '~/config/host'
 
 export const request = axios.create({
@@ -26,7 +26,10 @@ request.interceptors.response.use(
 	function (error) {
 		// 超出 2xx 范围的状态码都会触发该函数。
 		// 对响应错误做点什么
-		console.log(error)
+		console.log('error', error)
+		if (error.code === 'ECONNABORTED' || error.message === 'Network Error' || error.message.includes('timeout')) {
+			Snackbar.error('连接超时,请检查网络')
+		}
 		return Promise.reject(error)
 	}
 )
