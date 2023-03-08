@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { urlParamsStore } from '~/store/urlParamsStore'
-import { setReactive } from '~/utils'
+import { setReactive, richTextFilterText } from '~/utils'
+import { useRouter } from 'vue-router'
 import empty from '~/components/empty-page/index.vue'
 import issueInfoPopup from './components/issue-info-popup.vue'
 import richTextPicture from './components/rich-text-picture.vue'
@@ -31,8 +32,8 @@ const getPreparingInfo = async () => {
 	if (res.status === 200) {
 		setReactive(preparingInfo, res.data)
 		if (preparingInfo.id) {
-			getIsuueList()
-			getTasklog(preparingInfo.id)
+			await getIsuueList()
+			await getTasklog(preparingInfo.id)
 		}
 	}
 	loading.value = false
@@ -61,38 +62,59 @@ const emptyTitle = computed(() => {
 })
 
 //发布问题
-const pushIssue = async (sid: number, startTime: number, endTime: number) => {
+const pushIssue = async (sid: number, endTime: number) => {
 	const params = {
 		pid: preparingInfo.id,
 		sid,
-		startTime,
 		endTime,
 		jobNum: preparingInfo.jobNum,
 		type: 2
 	}
 	const res = await api.pushIssue(params)
 	if (res.status === 200) {
-		Snackbar.success('题目发布成功')
-		console.log(res)
+		getTasklog(preparingInfo.id)
 	} else {
 		Snackbar.error('发布问题失败')
 	}
 }
+
 const pushIssueDialogConfirm = (confirmInfo: { id: number; endTime: number }) => {
 	const startTimestamp = dayjs().valueOf()
 	const endTimestamp = startTimestamp + confirmInfo.endTime * 60000
-	console.log(confirmInfo.id, startTimestamp, endTimestamp)
-	pushIssue(confirmInfo.id, startTimestamp, endTimestamp)
+	pushIssue(confirmInfo.id, endTimestamp)
 }
 const pushIssueDialogRef = ref()
 const issueInfoPopupRef = ref()
 
+const snackbarShow = computed({
+	get() {
+		return tasklog.value.length === 0 ? false : true
+	},
+	set(value) {
+		return value
+	}
+})
+const tasklog = ref<Array<any>>([])
+
 //获取任务记录进行中
+const TasklogEndTime = ref(0)
 const getTasklog = async (pid: number) => {
 	const res = await api.getTasklogById({ pid, timeType: 2 })
 	if (res.status === 200) {
-		console.log(res)
+		tasklog.value = res.data
+		const timeOut = Math.abs(dayjs().valueOf() - res.data[0].endTime)
+		TasklogEndTime.value = timeOut
+		setTimeout(() => {
+			tasklog.value = []
+		}, timeOut)
+	} else {
+		tasklog.value = []
 	}
+}
+
+const router = useRouter()
+const goToAnswerInfoPage = () => {
+	router.push('/answer-info')
 }
 </script>
 
@@ -101,12 +123,12 @@ const getTasklog = async (pid: number) => {
 		<div v-if="urlParamsStore.Teacher">
 			<div flex justify-between items-center py-10px px-10px border-0 border-solid border-b-1px v-for="item in issuePaging.isuueList">
 				<div max-w-200px truncate text-12px>
-					{{ item.title.replace(/<[^>]+>/g, '') }}
+					{{ richTextFilterText(item.title) }}
 					<richTextPicture :rich-text="item.title"></richTextPicture>
 				</div>
 				<div>
 					<var-button size="small" type="info" @click="issueInfoPopupRef.open(item.id)">详细信息</var-button>
-					<var-button size="small" type="success" ml-10px @click="pushIssueDialogRef.open(item.id)">发布题目</var-button>
+					<var-button size="small" type="success" :disabled="snackbarShow" ml-10px @click="pushIssueDialogRef.open(item.id)">发布题目</var-button>
 				</div>
 			</div>
 		</div>
@@ -126,4 +148,17 @@ const getTasklog = async (pid: number) => {
 	</var-loading>
 	<pushIssueDialog ref="pushIssueDialogRef" @confirm="pushIssueDialogConfirm"></pushIssueDialog>
 	<issueInfoPopup ref="issueInfoPopupRef"></issueInfoPopup>
+	<var-snackbar v-model:show="snackbarShow" position="bottom" :duration="Infinity">
+		<div>
+			<span>您有一个已发布的任务</span>
+			<div flex>
+				<span>将于</span>
+				<var-countdown :time="TasklogEndTime" format="mm分ss秒" class="text-green font-700 mx-4px" />
+				<span>后结束</span>
+			</div>
+		</div>
+		<template #action>
+			<var-button type="success" @click="goToAnswerInfoPage">查看</var-button>
+		</template>
+	</var-snackbar>
 </template>

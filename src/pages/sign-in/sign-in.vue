@@ -1,22 +1,20 @@
 <script lang="ts" setup>
 import { setReactive } from '~/utils/objectTool'
+import { urlParamsStore } from '~/store'
 import dayjs from 'dayjs'
 import { IcourseInfo, IIoRes } from './interface'
 import manIcon from '~/assets/img/txnan.png'
 import girlIcon from '~/assets/img/txnv.png'
-import { getUrlParams } from '~/utils/getUrlParams'
 import empty from '~/components/empty-page/index.vue'
-const urlParams = getUrlParams()
-console.log('url参数', urlParams)
 
 //检查url 参数是否存在
 let isTeacher = false
 let isTerminalmac = false
 const checkUrlParams = () => {
-	if (!urlParams.Teacher) {
+	if (!urlParamsStore.Teacher) {
 		isTeacher = true
 	}
-	if (!urlParams.Terminalmac) {
+	if (!urlParamsStore.Terminalmac) {
 		isTerminalmac = true
 	}
 }
@@ -57,7 +55,7 @@ const signInArr = computed(() => courseInfo.stuInfo.filter((item) => !courseInfo
 const isCourse = ref(false)
 const isStart = ref(true) // true 未开启签到 ，false 已开始签到
 const getCourseInfo = async () => {
-	const res = await api.getCourseInfoApi({ cardId: urlParams.Teacher })
+	const res = await api.getCourseInfoApi({ cardId: urlParamsStore.Teacher })
 	if (res.status === 200) {
 		setReactive(courseInfo, res.data)
 		isStart.value = ['未开始', '已结束'].includes(courseInfo.state)
@@ -71,8 +69,8 @@ getCourseInfo()
 //发起签到
 const startSign = async () => {
 	const params = {
-		classRoomMac: urlParams.Terminalmac, //教室Mac
-		jobNum: urlParams.Teacher, // 老师是工号
+		classRoomMac: urlParamsStore.Terminalmac, //教室Mac
+		jobNum: urlParamsStore.Teacher, // 老师是工号
 		signEndTime: +dayjs() + signTimeTimestamp.value
 	}
 	const res = await api.startSign(params)
@@ -83,7 +81,7 @@ const startSign = async () => {
 
 // 结束签到
 const endSign = async () => {
-	const res = await api.stopSign({ className: courseInfo.className, cardId: 'P1000100' })
+	const res = await api.stopSign({ className: courseInfo.className, cardId: urlParamsStore.Teacher })
 	if (res.status === 200) {
 		getCourseInfo()
 		Snackbar.success('结束签到成功')
@@ -97,9 +95,9 @@ const autoEndSign = () => {
 }
 
 //ws
-const signInIo = api.signInIo({ cardId: 'P1000100' })
+const socket = api.socket({ cardId: urlParamsStore.Teacher })
 //监听签到
-signInIo.on('onSign', (data: IIoRes) => {
+socket.on('onSign', (data: IIoRes) => {
 	if (data.type === 'success') {
 		let isRepeat = courseInfo.stuSignAts.includes(data.message) // 判断是否已经存在 如果不存在 那么添加进数组
 		if (!isRepeat) courseInfo.stuSignAts.push(data.message)
@@ -108,8 +106,7 @@ signInIo.on('onSign', (data: IIoRes) => {
 
 onBeforeUnmount(() => {
 	Snackbar.error('离开页面')
-	// signInIo.off('onSign')
-	console.log('%cindex.vue line:117 离开页面', 'color: #007acc;')
+	socket.disconnect()
 })
 </script>
 

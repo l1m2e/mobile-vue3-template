@@ -10,7 +10,7 @@ export interface IPushParams {
 	sid: number
 	passLine?: number
 	jobNum: string
-	startTime: number
+	startTime?: number
 	endTime: number
 	type: number
 	signCount?: number

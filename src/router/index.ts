@@ -9,12 +9,17 @@ const routes = [
 	{
 		path: '/sign-in',
 		name: 'sign-in',
-		component: () => import('~/pages/sign-in/index.vue')
+		component: () => import('~/pages/sign-in/sign-in.vue')
 	},
 	{
-		path: '/class-interaction',
-		name: 'class-interaction',
-		component: () => import('~/pages/class-interaction/index.vue')
+		path: '/issue-list',
+		name: 'issue-list',
+		component: () => import('~/pages/issue-list/issue-list.vue')
+	},
+	{
+		path: '/answer-info',
+		name: 'answer-info',
+		component: () => import('~/pages/answer-info/answer-info.vue')
 	}
 ]
 
