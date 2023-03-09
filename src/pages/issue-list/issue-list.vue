@@ -114,7 +114,9 @@ const getTasklog = async (pid: number) => {
 
 const router = useRouter()
 const goToAnswerInfoPage = () => {
-	router.push('/answer-info')
+	const query = tasklog.value[0]
+	console.log(query)
+	router.push({ path: '/answer-info', query })
 }
 </script>
 

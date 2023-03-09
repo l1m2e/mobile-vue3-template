@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { setReactive } from '~/utils/objectTool'
 import { urlParamsStore } from '~/store'
+import { useSocket } from '~/service'
 import dayjs from 'dayjs'
 import { IcourseInfo, IIoRes } from './interface'
 import manIcon from '~/assets/img/txnan.png'
@@ -95,7 +96,7 @@ const autoEndSign = () => {
 }
 
 //ws
-const socket = api.socket({ cardId: urlParamsStore.Teacher })
+const socket = useSocket()
 //监听签到
 socket.on('onSign', (data: IIoRes) => {
 	if (data.type === 'success') {
@@ -113,7 +114,7 @@ onBeforeUnmount(() => {
 <template>
 	<empty v-if="isTeacher" type="error" text="没有卡号"></empty>
 	<empty v-else-if="isTerminalmac" type="error" text="没有MAC"></empty>
-	<empty v-else-if="isCourse" text="暂无课程"></empty>
+	<!-- <empty v-else-if="isCourse" text="暂无课程"></empty> -->
 	<div v-else>
 		<div w-screen h-30 p-1 color-black text-5>
 			<div class="text-box">
