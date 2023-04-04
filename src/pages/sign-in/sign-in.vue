@@ -33,25 +33,33 @@ const onConfirm = (e: any) => {
 	console.log(signTime.value)
 }
 
-// prettier-ignore
 const courseInfo = reactive<IcourseInfo>({
-	startTime: 0,    // 开始时间戳
-	endTime: 0,      // 结束时间戳
-	teacherName: '', // 老师名字P1000100
-	courseName: '',  // 课程名字
-	className: '',   // 教室名字
-	stuInfo: [],     // 全部学生列表
-	state: '',       // 签到状态
-	signEndTime: 0,  // 签到结束
-	aid:0,					 // 签到id
-	stuSignAts:[]    // 已经签到的学生
+	/** 开始时间戳 */
+	startTime: 0,
+	/** 结束时间戳 */
+	endTime: 0,
+	/** 老师名字P1000100 */
+	teacherName: '',
+	/** 课程名字 */
+	courseName: '',
+	/** 教室名字 */
+	className: '',
+	/** 全部学生列表 */
+	stuInfo: [],
+	/** 签到状态 */
+	state: '',
+	/** 签到结束 */
+	signEndTime: 0,
+	/** 签到id */
+	aid: 0,
+	/** 已经签到的学生 */
+	stuSignAts: []
 })
 
 // 缺席数组
 const absentArr = computed(() => courseInfo.stuInfo.filter((item) => courseInfo.stuSignAts.includes(item.studentId)))
 // 签到数组
 const signInArr = computed(() => courseInfo.stuInfo.filter((item) => !courseInfo.stuSignAts.includes(item.studentId)))
-
 // 获取课程信息
 const isCourse = ref(false)
 const isStart = ref(true) // true 未开启签到 ，false 已开始签到
