@@ -30,20 +30,8 @@ const urlParams = reactive({
 	Teacher: ''
 })
 setReactive(urlParams, useUrlSearchParams('hash'))
-const emdTime = computed(() => parseInt(urlParams.endTime) - dayjs().valueOf())
 
-//当前状态
-const answerStatus = reactive({
-	/** 班级人数 */
-	classCount: 0,
-	/** 答题人数 */
-	answerCount: 0,
-	/** 已完成人数 */
-	completedCount: 0,
-	/** 未完成人数 */
-	unfinishedCount: 0
-})
-
+const emdTime = computed(() => parseInt(urlParams.endTime) - dayjs().valueOf()) // 结束时间
 const stuInfoList = ref<Array<any>>([]) //学生列表
 const answeredList = ref<Array<any>>([]) //答题列表
 // 未答题列表
@@ -60,7 +48,6 @@ const correctPercent = computed(() => {
 const getCourseInfo = async () => {
 	const res = await api.getCourseInfoApi({ cardId: urlParamsStore.Teacher })
 	if (res.status === 200) {
-		answerStatus.classCount = res.data.total
 		stuInfoList.value = res.data.stuInfo
 	}
 }
