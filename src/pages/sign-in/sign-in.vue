@@ -48,6 +48,8 @@ const courseInfo = reactive<IcourseInfo>({
 	stuInfo: [],
 	/** 签到状态 */
 	state: '',
+	/** 签到开始时间 */
+	signStartTime: 0,
 	/** 签到结束 */
 	signEndTime: 0,
 	/** 签到id */
@@ -57,12 +59,14 @@ const courseInfo = reactive<IcourseInfo>({
 })
 
 // 缺席数组
-const absentArr = computed(() => courseInfo.stuInfo.filter((item) => courseInfo.stuSignAts.includes(item.studentId)))
+const absentArr = computed(() => courseInfo.stuInfo.filter((item) => !courseInfo.stuSignAts.includes(item.studentId)))
 // 签到数组
-const signInArr = computed(() => courseInfo.stuInfo.filter((item) => !courseInfo.stuSignAts.includes(item.studentId)))
-// 获取课程信息
+const signInArr = computed(() => courseInfo.stuInfo.filter((item) => courseInfo.stuSignAts.includes(item.studentId)))
+
 const isCourse = ref(false)
 const isStart = ref(true) // true 未开启签到 ，false 已开始签到
+const isWifiCheck = ref(true)
+// 获取课程信息
 const getCourseInfo = async () => {
 	const res = await api.getCourseInfoApi({ cardId: urlParamsStore.Teacher })
 	if (res.status === 200) {
@@ -70,18 +74,20 @@ const getCourseInfo = async () => {
 		isStart.value = ['未开始', '已结束'].includes(courseInfo.state)
 		return
 	}
-	console.log('hello')
 	isCourse.value = true
 }
 getCourseInfo()
 
 //发起签到
-const startSign = async () => {
+const startSign = async (retroactive: boolean = false) => {
 	const params = {
 		classRoomMac: urlParamsStore.Terminalmac, //教室Mac
 		jobNum: urlParamsStore.Teacher, // 老师是工号
-		signEndTime: +dayjs() + signTimeTimestamp.value
+		signEndTime: dayjs().valueOf() + signTimeTimestamp.value,
+		wifiFlag: isWifiCheck.value,
+		...(retroactive && { signStartTime: courseInfo.signStartTime }) //判断是否为补签
 	}
+
 	const res = await api.startSign(params)
 	if (res.status === 400) return Snackbar.error('发起签到失败')
 	Snackbar.success('发起签到成功')
@@ -107,6 +113,7 @@ const autoEndSign = () => {
 const socket = useSocket()
 //监听签到
 socket.on('onSign', (data: IIoRes) => {
+	console.log(data)
 	if (data.type === 'success') {
 		let isRepeat = courseInfo.stuSignAts.includes(data.message) // 判断是否已经存在 如果不存在 那么添加进数组
 		if (!isRepeat) courseInfo.stuSignAts.push(data.message)
@@ -122,7 +129,7 @@ onBeforeUnmount(() => {
 <template>
 	<empty v-if="isTeacher" type="error" text="没有卡号"></empty>
 	<empty v-else-if="isTerminalmac" type="error" text="没有MAC"></empty>
-	<!-- <empty v-else-if="isCourse" text="暂无课程"></empty> -->
+	<empty v-else-if="isCourse" text="暂无课程"></empty>
 	<div v-else>
 		<div w-screen h-30 p-1 color-black text-5>
 			<div class="text-box">
@@ -158,9 +165,17 @@ onBeforeUnmount(() => {
 				<var-button type="success" font-700 block flex-1 v-else>
 					<var-countdown :time="courseInfo.signEndTime - +dayjs()" format="剩余 mm 分 ss 秒" @end="autoEndSign" />
 				</var-button>
-				<var-button ml-1 type="success" font-700 block flex-1 @click="startSign" v-if="isStart">开始签到</var-button>
+				<div v-if="isStart" flex flex-1>
+					<var-button ml-1 type="success" font-700 block flex-1 @click="startSign(true)">
+						{{ signInArr.length !== 0 ? '补签' : '开始签到' }}
+					</var-button>
+					<var-button ml-1 type="success" font-700 block flex-1 @click="startSign()" v-if="signInArr.length !== 0">重新签到</var-button>
+				</div>
 				<var-button ml-1 type="danger" font-700 block flex-1 @click="endSign" v-else>结束签到</var-button>
 			</div>
+			<var-button m-auto mt-10px :type="isWifiCheck ? 'warning' : 'success'" font-700 block flex-1 @click="isWifiCheck = !isWifiCheck">
+				{{ isWifiCheck ? '已开启 wifi 校验' : '已关闭 wifi 校验' }}
+			</var-button>
 			<div class="title">
 				<div>总人数：{{ courseInfo.stuInfo.length }}</div>
 				<div>实到人数：{{ signInArr.length }}</div>

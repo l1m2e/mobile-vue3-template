@@ -6,6 +6,7 @@ export interface IcourseInfo {
 	className: string
 	stuInfo: Array<IstuInfo>
 	state: string
+	signStartTime: number
 	signEndTime: number
 	aid: number
 	stuSignAts: Array<string>
