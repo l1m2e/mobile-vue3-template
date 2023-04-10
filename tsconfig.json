@@ -20,6 +20,6 @@
 			"~/*": ["src/*"]
 		}
 	},
-	"include": ["./src", "./types", "global.d.ts", "auto-imports.d.ts", "components.d.ts", "./src/**/*"],
+	"include": ["./src", "./types", "global.d.ts", "auto-imports.d.ts", "components.d.ts"],
 	"exclude": ["dist", "node_modules"]
 }

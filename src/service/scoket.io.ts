@@ -3,8 +3,11 @@ export const io = require('socket.io-client')
 
 export let socketUrl = ''
 
+let socket: any
 export const useSocket = () => {
-	return io(`${socketUrl}/CInteractTea`, { query: { cardId: urlParamsStore.Teacher }, transports: ['websocket'] })
+	if (socket) return socket
+	socket = io(`${socketUrl}/CInteractTea`, { query: { cardId: urlParamsStore.Teacher }, transports: ['websocket'] })
+	return socket
 }
 
 // 获取ws链接

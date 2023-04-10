@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import { useSocket } from '~/service'
-import { urlParamsStore } from '~/store'
 import { setReactive, getKeysObjec } from '~/utils'
 import manIcon from '~/assets/img/txnan.png'
 import girlIcon from '~/assets/img/txnv.png'
+import { courseInfoStore } from '~/store'
 
 //获取url传递过来的参数
 const urlParams = reactive({
@@ -27,31 +27,23 @@ const urlParams = reactive({
 	/** 回答错误的人数 */
 	wrong: '',
 	/** 老师工号 */
-	Teacher: ''
+	Teacher: '',
+	/** 班级名称 */
+	className: ''
 })
 setReactive(urlParams, useUrlSearchParams('hash'))
 
 const emdTime = computed(() => parseInt(urlParams.endTime) - dayjs().valueOf()) // 结束时间
-const stuInfoList = ref<Array<any>>([]) //学生列表
 const answeredList = ref<Array<any>>([]) //答题列表
 // 未答题列表
 const unansweredStudents = computed(() =>
-	stuInfoList.value.filter((item) => !answeredList.value.map((item) => item.studentId).includes(item.studentId))
+	courseInfoStore.classList.filter((item) => !answeredList.value.map((item) => item.studentId).includes(item.studentId))
 )
 //正确的列表
 const correctPercent = computed(() => {
 	const trueCount = answeredList.value.filter((item) => item.resultFlag).length
 	return trueCount === 0 ? 0 : (trueCount / answeredList.value.length) * 100
 })
-
-//获取学生列表
-const getCourseInfo = async () => {
-	const res = await api.getCourseInfoApi({ cardId: urlParamsStore.Teacher })
-	if (res.status === 200) {
-		stuInfoList.value = res.data.stuInfo
-	}
-}
-getCourseInfo()
 
 //获取已答题列表
 const getAnswerInfo = async () => {
@@ -102,7 +94,7 @@ onUnmounted(() => {
 			<div flex justify-center items-center min-w-30vw h="100%" p-10px flex-col>
 				<var-progress
 					mode="circle"
-					:value="(answeredList.length / stuInfoList.length) * 100"
+					:value="(answeredList.length / courseInfoStore.classList.length) * 100"
 					:size="80"
 					ripple
 					color="#67eaa0"
@@ -118,7 +110,7 @@ onUnmounted(() => {
 				</div>
 				<div w="100%" mt-10px>
 					<var-row>
-						<var-col :span="12">班级总人数: {{ stuInfoList.length }}</var-col>
+						<var-col :span="12">班级总人数: {{ courseInfoStore.classList.length }}</var-col>
 						<var-col :span="12">正确率: {{ correctPercent }}%</var-col>
 					</var-row>
 					<var-row mt-20px>

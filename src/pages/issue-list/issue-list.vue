@@ -8,7 +8,7 @@ import richTextPicture from './components/rich-text-picture.vue'
 import pushIssueDialog from './components/push-issue-dialog.vue'
 import dayjs from 'dayjs'
 
-// 课程信息对象
+// 备课信息对象
 const preparingInfo = reactive({
 	classDeviceName: '', // 教室
 	className: '', // 班级名称
@@ -19,11 +19,11 @@ const preparingInfo = reactive({
 	id: 0, // 备课id
 	jobNum: '', // 老师工号
 	teacherName: '', // 老师名称
-	title: '课程名称1',
+	title: '',
 	updateTimestamp: 0 // 修改时间戳
 })
 
-// 获取课程信息
+// 获取备课信息
 const loading = ref(false)
 const getPreparingInfo = async () => {
 	if (!urlParamsStore.Teacher) return
@@ -86,14 +86,8 @@ const pushIssueDialogConfirm = (confirmInfo: { id: number; endTime: number }) =>
 const pushIssueDialogRef = ref()
 const issueInfoPopupRef = ref()
 
-const snackbarShow = computed({
-	get() {
-		return tasklog.value.length === 0 ? false : true
-	},
-	set(value) {
-		return value
-	}
-})
+const snackbarShow = computed(() => (tasklog.value.length === 0 ? false : true))
+
 const tasklog = ref<Array<any>>([])
 
 //获取任务记录进行中
@@ -114,9 +108,19 @@ const getTasklog = async (pid: number) => {
 
 const router = useRouter()
 const goToAnswerInfoPage = () => {
-	const query = { ...tasklog.value[0], ...urlParamsStore }
-	console.log(query)
+	const query = { ...tasklog.value[0], ...urlParamsStore, className: preparingInfo.className }
 	router.push({ path: '/answer-info', query })
+}
+
+//发布答案
+const releaseAnswer = async (item: any) => {
+	const res = await api.result(item.id)
+	if (res.status === 200) {
+		Snackbar.success('发布答案成功')
+		item.result = true
+	} else {
+		Snackbar.error('发布答案失败')
+	}
 }
 </script>
 
@@ -129,6 +133,9 @@ const goToAnswerInfoPage = () => {
 					<richTextPicture :rich-text="item.title"></richTextPicture>
 				</div>
 				<div>
+					<var-button size="small" :type="item.result ? 'info' : 'success'" @click="releaseAnswer(item)" :disabled="item.result" mr-10px>
+						{{ item.result ? '已发布答案' : '发布答案' }}
+					</var-button>
 					<var-button size="small" type="info" @click="issueInfoPopupRef.open(item.id)">详细信息</var-button>
 					<var-button size="small" type="success" :disabled="snackbarShow" ml-10px @click="pushIssueDialogRef.open(item.id)">发布题目</var-button>
 				</div>
