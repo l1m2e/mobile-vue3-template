@@ -96,11 +96,6 @@ const countDownEnd = () => {
 	router.push({ path: '/issue-list', query: params })
 }
 
-//离开页面
-onUnmounted(() => {
-	socket.disconnect()
-})
-
 const issueInfoPopupRef = ref()
 const checkAnswer = (item: any) => {
 	console.log(item)
