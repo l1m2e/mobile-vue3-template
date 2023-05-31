@@ -3,10 +3,11 @@ import { urlParamsStore } from '~/store/urlParamsStore'
 import { setReactive, richTextFilterText } from '~/utils'
 import { useRouter } from 'vue-router'
 import empty from '~/components/empty-page/index.vue'
-import issueInfoPopup from './components/issue-info-popup.vue'
+import issueInfoPopup from '~/components/issue-info-popup/issue-info-popup.vue'
 import richTextPicture from './components/rich-text-picture.vue'
 import pushIssueDialog from './components/push-issue-dialog.vue'
 import dayjs from 'dayjs'
+import { useIssueId } from '~/store'
 
 // 备课信息对象
 const preparingInfo = reactive({
@@ -61,27 +62,37 @@ const emptyTitle = computed(() => {
 	if (preparingInfo.id === 0) return '题库无数据当前课程暂未备课'
 })
 
+interface ConfirmInfo {
+	id: number
+	endTime: number
+	count: number
+	isAnsweringEnabled: boolean
+}
+
 //发布问题
-const pushIssue = async (sid: number, endTime: number) => {
+const pushIssue = async (data: ConfirmInfo) => {
+	const signCount = data.isAnsweringEnabled ? { signCount: data.count } : {}
 	const params = {
 		pid: preparingInfo.id,
-		sid,
-		endTime,
+		sid: data.id,
+		endTime: data.endTime,
 		jobNum: preparingInfo.jobNum,
-		type: 2
+		type: 2,
+		...signCount
 	}
 	const res = await api.pushIssue(params)
 	if (res.status === 200) {
 		getTasklog(preparingInfo.id)
+		useIssueId.value = data.id
 	} else {
 		Snackbar.error('发布问题失败')
 	}
 }
 
-const pushIssueDialogConfirm = (confirmInfo: { id: number; endTime: number }) => {
+const pushIssueDialogConfirm = (confirmInfo: ConfirmInfo) => {
 	const startTimestamp = dayjs().valueOf()
-	const endTimestamp = startTimestamp + confirmInfo.endTime * 60000
-	pushIssue(confirmInfo.id, endTimestamp)
+	confirmInfo.endTime = startTimestamp + confirmInfo.endTime * 60000
+	pushIssue(confirmInfo)
 }
 const pushIssueDialogRef = ref()
 const issueInfoPopupRef = ref()
@@ -91,6 +102,7 @@ const snackbarShow = computed(() => (tasklog.value.length === 0 ? false : true))
 const tasklog = ref<Array<any>>([])
 
 //获取任务记录进行中
+
 const TasklogEndTime = ref(0)
 const getTasklog = async (pid: number) => {
 	const res = await api.getTasklogById({ pid, timeType: 2 })
@@ -98,6 +110,7 @@ const getTasklog = async (pid: number) => {
 		tasklog.value = res.data
 		const timeOut = Math.abs(dayjs().valueOf() - res.data[0].endTime)
 		TasklogEndTime.value = timeOut
+
 		setTimeout(() => {
 			tasklog.value = []
 		}, timeOut)

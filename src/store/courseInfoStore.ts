@@ -22,6 +22,8 @@ export const courseInfoStore = reactive({
 	classList: new Array<any>()
 })
 
+export const useIssueId = useStorage('issueId', 0)
+
 /** 获取课程信息 */
 export const getCourseInfo = async () => {
 	const res = await api.getCourseInfo(urlParamsStore.Teacher)

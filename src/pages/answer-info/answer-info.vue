@@ -4,8 +4,9 @@ import { useSocket } from '~/service'
 import { setReactive, getKeysObjec } from '~/utils'
 import manIcon from '~/assets/img/txnan.png'
 import girlIcon from '~/assets/img/txnv.png'
-import { courseInfoStore } from '~/store'
+import { courseInfoStore, useIssueId } from '~/store'
 
+import issueInfoPopup from '~/components/issue-info-popup/issue-info-popup.vue'
 //获取url传递过来的参数
 const urlParams = reactive({
 	/** 答题总人数 */
@@ -33,12 +34,16 @@ const urlParams = reactive({
 })
 setReactive(urlParams, useUrlSearchParams('hash'))
 
+const isAnsweringEnabled = computed(() => parseInt(urlParams.signCount) !== 0) // 是否开启了抢答
+
 const emdTime = computed(() => parseInt(urlParams.endTime) - dayjs().valueOf()) // 结束时间
 const answeredList = ref<Array<any>>([]) //答题列表
+
 // 未答题列表
 const unansweredStudents = computed(() =>
 	courseInfoStore.classList.filter((item) => !answeredList.value.map((item) => item.studentId).includes(item.studentId))
 )
+
 //正确的列表
 const correctPercent = computed(() => {
 	const trueCount = answeredList.value.filter((item) => item.resultFlag).length
@@ -53,6 +58,15 @@ const getAnswerInfo = async () => {
 	}
 }
 getAnswerInfo()
+
+//未答题人数
+const unansweredCount = computed(() => {
+	if (isAnsweringEnabled.value) {
+		return Math.round((answeredList.value.length / parseInt(urlParams.signCount)) * 100)
+	} else {
+		return Math.round((answeredList.value.length / courseInfoStore.classList.length) * 100)
+	}
+})
 
 // webSocket 监听
 const socket = useSocket()
@@ -86,6 +100,12 @@ const countDownEnd = () => {
 onUnmounted(() => {
 	socket.disconnect()
 })
+
+const issueInfoPopupRef = ref()
+const checkAnswer = (item: any) => {
+	console.log(item)
+	issueInfoPopupRef.value.open(useIssueId.value, item.answer)
+}
 </script>
 
 <template>
@@ -94,7 +114,7 @@ onUnmounted(() => {
 			<div flex justify-center items-center min-w-30vw h="100%" p-10px flex-col>
 				<var-progress
 					mode="circle"
-					:value="(answeredList.length / courseInfoStore.classList.length) * 100"
+					:value="unansweredCount"
 					:size="80"
 					ripple
 					color="#67eaa0"
@@ -115,7 +135,8 @@ onUnmounted(() => {
 					</var-row>
 					<var-row mt-20px>
 						<var-col :span="12">已完成人数:{{ answeredList.length }}</var-col>
-						<var-col :span="12">未完成人数: {{ unansweredStudents.length }}</var-col>
+						<var-col :span="12" v-if="!isAnsweringEnabled">未完成人数: {{ unansweredStudents.length }}</var-col>
+						<var-col :span="12" v-else>抢答人数: {{ urlParams.signCount }}</var-col>
 					</var-row>
 				</div>
 			</div>
@@ -125,13 +146,17 @@ onUnmounted(() => {
 	<div class="stuBox">
 		<div text-start border=" 0 solid #3a7afe l-5px" pl-5px>已答题</div>
 		<div w="100%" p-2 bg="#ebeff2" mt-2 rounded grid grid-cols-5 gap-2>
-			<div center flex-col v-for="item in answeredList">
+			<div center flex-col relative v-for="item in answeredList" @click="checkAnswer(item)">
 				<img :src="item.sex ? manIcon : girlIcon" w-10 h-10 />
 				<div center text-1 mt-1>{{ item.studentName }}</div>
+				<div
+					:class="`${
+						item.resultFlag === undefined ? '' : item.resultFlag ? 'i-carbon:checkmark bg-green' : 'i-carbon:close bg-red'
+					} absolute bottom-15px right-0px`"></div>
 			</div>
 		</div>
 	</div>
-	<div class="stuBox">
+	<div class="stuBox" v-if="!isAnsweringEnabled">
 		<div text-start border=" 0 solid #3a7afe l-5px" pl-5px>未答题</div>
 		<div w="100%" p-2 bg="#ebeff2" mt-2 rounded grid grid-cols-5 gap-2>
 			<div center flex-col v-for="item in unansweredStudents">
@@ -140,6 +165,7 @@ onUnmounted(() => {
 			</div>
 		</div>
 	</div>
+	<issueInfoPopup ref="issueInfoPopupRef" />
 </template>
 
 <style scoped>

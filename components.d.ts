@@ -8,13 +8,14 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     EmptyPage: typeof import('./src/components/empty-page/index.vue')['default']
+    IssueInfoPopup: typeof import('./src/components/issue-info-popup/issue-info-popup.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VarButton: typeof import('@varlet/ui')['_ButtonComponent']
-    VarCard: typeof import('@varlet/ui')['_CardComponent']
     VarChip: typeof import('@varlet/ui')['_ChipComponent']
     VarCol: typeof import('@varlet/ui')['_ColComponent']
     VarCountdown: typeof import('@varlet/ui')['_CountdownComponent']
+    VarCounter: typeof import('@varlet/ui')['_CounterComponent']
     VarDialog: typeof import('@varlet/ui')['_DialogComponent']
     VarLoading: typeof import('@varlet/ui')['_LoadingComponent']
     VarPopup: typeof import('@varlet/ui')['_PopupComponent']
@@ -24,5 +25,6 @@ declare module '@vue/runtime-core' {
     VarSnackbar: typeof import('@varlet/ui')['_SnackbarComponent']
     VarSwipe: typeof import('@varlet/ui')['_SwipeComponent']
     VarSwipeItem: typeof import('@varlet/ui')['_SwipeItemComponent']
+    VarSwitch: typeof import('@varlet/ui')['_SwitchComponent']
   }
 }

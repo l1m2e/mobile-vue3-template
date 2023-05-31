@@ -2,9 +2,10 @@
 import { ref } from 'vue'
 import { setReactive, toChineseNumber } from '~/utils'
 const show = ref(false)
-const open = (id: number) => {
+const open = async (id: number, answer?: Array<string>) => {
 	show.value = true
-	getIssueInfo(id)
+	await getIssueInfo(id)
+	answer && (issueInfo.answer = answer)
 }
 defineExpose({ open })
 
