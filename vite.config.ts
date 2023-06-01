@@ -43,5 +43,5 @@ export default defineConfig({
 	test: {
 		environment: 'jsdom'
 	},
-	base: './'
+	base: './teacher-web'
 })
