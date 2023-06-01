@@ -7,6 +7,6 @@ export const urlParamsStore = reactive({
 
 export const getURLParams = () => {
 	//获取url上的参数 保存到全局
-	const urlParams = useUrlSearchParams('hash')
+	const urlParams = useUrlSearchParams('history')
 	setReactive(urlParamsStore, urlParams)
 }
